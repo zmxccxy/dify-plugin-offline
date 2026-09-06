@@ -83,6 +83,20 @@ uv pip install --dry-run --offline -r requirements.txt   ← same command the da
 | Input | a valid Dify plugin `.difypkg` that **contains `requirements.txt`** (official marketplace / GitHub release packages all do) |
 | Optional | `uv` for the offline-resolution verification step (`pip install uv`) |
 
+## Compatibility
+
+The tool uses only the Python standard library plus `pip`, with no shell commands or
+OS-specific paths, and runs on all major desktop OSes:
+
+| OS | Status |
+| -- | ------ |
+| macOS (arm64) | ✅ tested — full flow, arm64 & both-arch builds |
+| Linux (amd64) | ✅ tested — full flow in a Debian container, incl. `uv --offline` verification |
+| Linux (arm64) | ✅ same code path as the tested builds above |
+| Windows | ✅ compatible by design (stdlib only, UTF-8 console handling, `\`/`/` path handling); machine-testing welcome — please open an issue if anything breaks |
+
+Windows invocation: `python build-offline-pkg.py ...` (or `py -3 ...`).
+
 ## Quick start
 
 ```bash
@@ -304,6 +318,19 @@ Windows：
 ```powershell
 python build-offline-pkg.py --arch amd64 --pip-source tsinghua
 ```
+
+## 兼容性
+
+脚本只依赖 Python 标准库 + pip（无 shell 命令、无平台相关路径），三大桌面系统均可运行：
+
+| 系统 | 状态 |
+| ---- | ---- |
+| macOS (arm64) | ✅ 已实测——完整流程，arm64 与双架构构建 |
+| Linux (amd64) | ✅ 已实测——Debian 容器内完整流程，含 uv 离线验证 |
+| Linux (arm64) | ✅ 与上述实测构建同一代码路径 |
+| Windows | ✅ 设计兼容（纯标准库、UTF-8 控制台处理、路径分隔符处理）；欢迎实机验证，有问题提 issue |
+
+Windows 下调用：`python build-offline-pkg.py ...`（或 `py -3 ...`）。
 
 ## 参数
 
