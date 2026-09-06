@@ -251,6 +251,16 @@ This is a community tool, **not affiliated with or endorsed by langgenius / Dify
 style are inspired by the [official Dify repository](https://github.com/langgenius/dify) —
 thanks to the Dify team.
 
+## Star history
+
+<a href="https://star-history.com/#zmxccxy/dify-plugin-offline&date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zmxccxy/dify-plugin-offline&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zmxccxy/dify-plugin-offline&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zmxccxy/dify-plugin-offline&type=Date" width="600" />
+  </picture>
+</a>
+
 ## License
 
 [MIT](LICENSE)

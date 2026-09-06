@@ -217,6 +217,16 @@ uv pip install --dry-run --offline --target <tmp> \
 本项目为社区工具，**与 langgenius / Dify 官方无关**；"Dify" 等商标归其所有者所有。
 README 的排版与徽章风格参考了 [Dify 官方仓库](https://github.com/langgenius/dify)，致谢 Dify 团队。
 
+## Star 增长趋势
+
+<a href="https://star-history.com/#zmxccxy/dify-plugin-offline&date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zmxccxy/dify-plugin-offline&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zmxccxy/dify-plugin-offline&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zmxccxy/dify-plugin-offline&type=Date" width="600" />
+  </picture>
+</a>
+
 ## 许可证
 
 [MIT](LICENSE)
