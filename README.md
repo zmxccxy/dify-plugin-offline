@@ -6,261 +6,15 @@
 
 **Repackage Dify plugin packages for air-gapped / offline deployment**
 
-[Python 3.8+](https://www.python.org/) · macOS / Windows / Linux · [MIT License](LICENSE)
-
-[English](#english) | [中文说明](#中文说明)
+[English](README_EN.md) · [Python 3.8+](https://www.python.org/) · macOS / Windows / Linux · [MIT License](LICENSE)
 
 </div>
 
----
-
-# English
-
-## What problem does it solve
-
-Dify installs a plugin by having its plugin daemon (`plugin_daemon`) create a fresh Python
-virtual environment and install the plugin's dependencies with `uv pip install` /
-`uv sync` — which **requires network access to PyPI**. On intranet servers (air-gapped,
-government, enterprise, or lab environments) plugin installation therefore fails.
-
-**dify-plugin-offline** turns any existing plugin `.difypkg` into a **self-contained offline
-package**: every dependency wheel is bundled inside the package, and the daemon installs
-everything from local files — **no network needed at install time**.
-
-Born from a real-world case: installing the official `openai_api_compatible` plugin on an
-ARM64 intranet Dify 1.17.0 server.
-
-## How it works
-
-```
-original .difypkg
-      │
-      ▼  1. unzip
-plugin source + requirements.txt + pyproject.toml + uv.lock
-      │
-      ▼  2. pip download (per target arch: arm64 / amd64, manylinux2014 + manylinux_2_28,
-      │     Python version read from manifest.yaml → meta.runner.version)
-deps/*.whl
-      │
-      ▼  3. rewrite requirements.txt  →  ./deps/xxx.whl
-      │     (--arch both adds platform_machine markers)
-      ▼  4. remove pyproject.toml & uv.lock
-      │     → forces the daemon onto the requirements.txt (local) path
-      ▼  5. re-zip (deterministic, fixed timestamps)
-<name>-<arch>-offline.difypkg
-      │
-      ▼  6. optional verification
-uv pip install --dry-run --offline -r requirements.txt   ← same command the daemon uses
-```
-
-> Why remove `pyproject.toml`? When a plugin package contains `pyproject.toml`, the daemon
-> prefers `uv sync --frozen`, which resolves from the network. Removing it (and `uv.lock`)
-> forces the daemon to install from the bundled `requirements.txt` — fully offline.
-
-## Features
-
-- 🌍 **Cross-platform**: pure Python 3 stdlib + `pip`; runs identically on macOS, Windows and Linux
-- 🏗️ **Multi-arch**: `arm64`, `amd64`, or `both` (one universal package, wheel selected at
-  install time via `platform_machine` markers)
-- 🪞 **Configurable pip sources**: official PyPI, Aliyun, Tsinghua, Tencent, USTC, or any
-  custom index (e.g. an internal Nexus/Artifactory)
-- 📋 **Robust failure handling**: whole-file download first, then automatic per-package
-  retry; every failed dependency is logged individually, the run ends with exit code 1 and
-  never produces a half-baked package
-- 📝 **Full logging**: console + `build-offline-pkg.log`, timestamped, every retry recorded
-- ✅ **Built-in verification**: replicates the daemon's exact install command with
-  `uv pip install --dry-run --offline` when `uv` is available
-- 🔏 **Reproducible**: fixed zip timestamps → identical SHA256 on re-runs
-- 🚫 **No Dify CLI required**: the tool repackages an *existing* `.difypkg` (pure zip
-  manipulation + `pip download`)
-
-## Requirements
-
-| Item | Requirement |
-| ---- | ----------- |
-| Python | 3.8+ with `pip` (the wheels are downloaded by that same pip) |
-| Network | the build machine must reach the chosen pip index |
-| Input | a valid Dify plugin `.difypkg` that **contains `requirements.txt`** (official marketplace / GitHub release packages all do) |
-| Optional | `uv` for the offline-resolution verification step (`pip install uv`) |
-
-## Compatibility
-
-The tool uses only the Python standard library plus `pip`, with no shell commands or
-OS-specific paths, and runs on all major desktop OSes:
-
-| OS | Status |
-| -- | ------ |
-| macOS (arm64) | ✅ tested — full flow, arm64 & both-arch builds |
-| Linux (amd64) | ✅ tested — full flow in a Debian container, incl. `uv --offline` verification |
-| Linux (arm64) | ✅ same code path as the tested builds above |
-| Windows | ✅ compatible by design (stdlib only, UTF-8 console handling, `\`/`/` path handling); machine-testing welcome — please open an issue if anything breaks |
-
-Windows invocation: `python build-offline-pkg.py ...` (or `py -3 ...`).
-
-## Quick start
-
-```bash
-# 1. put the original plugin package next to the script
-cp ~/Downloads/openai_api_compatible-0.0.65.difypkg .
-
-# 2. build — default: arm64, official PyPI
-python3 build-offline-pkg.py
-
-# 3. result
-#    openai_api_compatible-0.0.65-arm64-offline.difypkg
-#    openai_api_compatible-0.0.65-arm64-offline.difypkg.sha256
-```
-
-Windows (cmd / PowerShell):
-
-```powershell
-python build-offline-pkg.py --arch amd64 --pip-source tsinghua
-```
-
-## Usage
-
-```
-python3 build-offline-pkg.py [options]
-```
-
-| Option | Values | Description |
-| ------ | ------ | ----------- |
-| `--input` | path | Original `.difypkg` (default: auto-detect a non-`-offline` `.difypkg` in the script directory) |
-| `--arch` | `arm64` / `amd64` / `both` | Target server architecture (default `arm64`). `both` = one universal package, roughly double the size |
-| `--pip-source` | `official` / `aliyun` / `tsinghua` / `tencent` / `ustc` | PyPI index for downloading wheels (default `official`) |
-| `--pip-index-url` | URL | Custom index (takes priority over `--pip-source`, e.g. internal Nexus/Artifactory) |
-| `--python-version` | e.g. `3.12` | Python version of the wheels (default: `meta.runner.version` from `manifest.yaml`, fallback 3.12) |
-| `--retries` | int | Retries per download action (default 3) |
-| `--no-verify` | — | Skip the `uv` offline-resolution verification |
-| `--log-file` | path | Log file (default `build-offline-pkg.log` next to the script) |
-| `--verbose` | — | Debug-level console output (the log file always records everything) |
-
-Output naming: `openai_api_compatible-0.0.65-arm64.difypkg` →
-`openai_api_compatible-0.0.65-arm64-offline.difypkg` (`--arch both` → `-all-arch-offline`).
-
-## Getting an original `.difypkg`
-
-1. **Official marketplace / GitHub release** of the plugin you need — recommended, it always
-   contains `requirements.txt`;
-2. **Build from source** with the official CLI: `dify plugin package <dir> -o out.difypkg`
-   — CLI install instructions: [Dify Plugin CLI](https://docs.dify.ai/en/develop-plugin/getting-started/cli)
-   (binaries: [dify-plugin-daemon releases](https://github.com/langgenius/dify-plugin-daemon/releases));
-3. Export from an existing Dify instance.
-
-> This tool only repackages. If you must build from source, use the official CLI first.
-
-## pip mirrors
-
-| Name | URL |
-| ---- | --- |
-| `official` | `https://pypi.org/simple` |
-| `aliyun` | `https://mirrors.aliyun.com/pypi/simple/` |
-| `tsinghua` | `https://pypi.tuna.tsinghua.edu.cn/simple` |
-| `tencent` | `https://mirrors.cloud.tencent.com/pypi/simple` |
-| `ustc` | `https://pypi.mirrors.ustc.edu.cn/simple/` |
-
-Mirrors occasionally lag behind PyPI for a few hours/days (e.g. a brand-new package version
-may be missing) — if a dependency fails, simply switch sources:
-
-```bash
-python3 build-offline-pkg.py --pip-source aliyun
-# or an internal mirror:
-python3 build-offline-pkg.py --pip-index-url http://nexus.internal/pypi/simple
-```
-
-## Logging & failure handling
-
-- Whole-file download first (fast); on failure it automatically switches to per-package
-  downloads, reusing everything already downloaded;
-- Each dependency gets its own retries and its own log line:
-
-```
-2026-09-06 18:14:51 [INFO] [3/43] gevent==26.5.0 —— 第 1/3 次下载尝试
-2026-09-06 18:14:53 [WARNING] [3/43] gevent==26.5.0 —— 失败(exit=1): ERROR: No matching distribution ...
-2026-09-06 18:15:02 [ERROR] 依赖下载失败: gevent==26.5.0
-...
-2026-09-06 18:15:02 [ERROR] 存在下载失败的依赖（43 条），详见上方 [ERROR] 日志: build-offline-pkg.log
-```
-
-- Failed runs exit with code **1** and produce no output package.
-
-## Verification
-
-When `uv` is installed, the script runs the **exact install command the Dify daemon uses**:
-
-```
-uv pip install --dry-run --offline --target <tmp> \
-    --python-platform aarch64-unknown-linux-gnu --python-version 3.12 \
-    -r requirements.txt
-```
-
-`离线解析验证通过` means the package can install on the server with zero network.
-
-## Installing on the offline server
-
-1. **Signature verification** — repackaging invalidates the official signature. If install
-   fails with `plugin verification has been enabled ... bad signature`, set in the Dify
-   deployment `.env` and restart the daemon:
-   ```bash
-   FORCE_VERIFYING_SIGNATURE=false
-   docker compose up -d plugin_daemon
-   ```
-2. **Package size limit** — Dify 1.17.0's api container defaults to
-   `PLUGIN_MAX_PACKAGE_SIZE=52428800` (50 MB). Fine for single-arch packages; raise it if a
-   `both` package exceeds it.
-3. **Front nginx** — `413 Request Entity Too Large` means the nginx in front of Dify needs
-   `client_max_body_size` > package size, then reload.
-
-## FAQ
-
-**Why `manylinux2014` and `manylinux_2_28`?**
-Some packages (e.g. recent gevent releases) only publish `manylinux_2_28` wheels. The
-official plugin-daemon image is Ubuntu 24.04 (glibc 2.39), which runs both.
-
-**Do I need the official Dify CLI?**
-No — repackaging only needs Python's `zipfile` + `pip download`. The CLI is only required
-if you must package a plugin from source code first.
-
-**Why is the SHA256 identical on every re-run?**
-Zip entries use fixed timestamps and sorted order, so identical content produces identical
-bytes — handy for CI and integrity tracking.
-
-**Will `--arch both` double the size?**
-Only the binary wheels are duplicated (with `platform_machine` markers); pure-Python wheels
-are stored once. A typical model-provider plugin goes from ~13 MB (single arch) to ~21 MB.
-
-**Can I use an internal mirror (Nexus/Artifactory)?**
-Yes: `--pip-index-url http://<mirror>/pypi/simple`.
-
-## Project structure
-
-```
-.
-├── build-offline-pkg.py          # the tool (Python 3 stdlib only)
-├── 离线包打包文档.md               # full Chinese documentation
-├── build-offline-pkg.log         # generated log (appended per run)
-├── LICENSE
-└── README.md
-```
-
-## Disclaimer
-
-This is a community tool, **not affiliated with or endorsed by langgenius / Dify**.
-"Dify" and related marks belong to their respective owners.
-
-## License
-
-[MIT](LICENSE) — replace the placeholder copyright line with your name.
-
----
-
-# 中文说明
-
 ## 解决什么问题
 
-Dify 安装插件时，插件守护进程（`plugin_daemon`）会为插件创建独立 Python 虚拟环境，
-用 `uv pip install` / `uv sync` 从 PyPI **联网**安装依赖。内网服务器（离线/涉密/实验室环境）
-装插件因此必然失败。
+Dify 安装插件时，插件守护进程（`plugin_daemon`）会为插件创建独立的 Python 虚拟环境，
+用 `uv pip install` / `uv sync` 从 PyPI **联网**安装依赖。内网服务器（离线 / 涉密 / 政企 /
+实验室环境）装插件因此必然失败。
 
 **dify-plugin-offline** 把任意现成的插件 `.difypkg` 重打包为**自包含离线包**：所有依赖
 wheel 内置进包内，守护进程全部从本地文件安装——**安装时完全不需要联网**。
@@ -273,7 +27,7 @@ wheel 内置进包内，守护进程全部从本地文件安装——**安装时
 原始 .difypkg
    │ 1. 解压
 插件源码 + requirements.txt + pyproject.toml + uv.lock
-   │ 2. pip download（按目标架构 arm64/amd64，manylinux2014+manylinux_2_28，
+   │ 2. pip download（按目标架构 arm64 / amd64，manylinux2014 + manylinux_2_28，
    │    Python 版本取自 manifest.yaml 的 meta.runner.version）
 deps/*.whl
    │ 3. 重写 requirements.txt → ./deps/xxx.whl（--arch both 时按 platform_machine 标记）
@@ -285,7 +39,7 @@ uv pip install --dry-run --offline -r requirements.txt   ← 与守护进程安�
 ```
 
 > 为什么删 `pyproject.toml`？包里有它时守护进程优先执行 `uv sync --frozen`（联网解析）。
-> 删掉它（和 `uv.lock`）后守护进程只能走 `requirements.txt`，即本地 wheel 安装。
+> 删掉它（和 `uv.lock`）后守护进程只能走 `requirements.txt`，即本地 wheel 离线安装。
 
 ## 特性
 
@@ -298,6 +52,28 @@ uv pip install --dry-run --offline -r requirements.txt   ← 与守护进程安�
 - ✅ 自动校验：装有 uv 时用守护进程同款命令 `uv pip install --dry-run --offline` 验证
 - 🔏 可复现：固定 zip 时间戳，重复打包 SHA256 一致
 - 🚫 不需要 Dify CLI：重打包只需 zip 操作 + pip download
+
+## 环境要求
+
+| 项目 | 要求 |
+| ---- | ---- |
+| Python | 3.8+ 且带 `pip`（wheel 由该 pip 下载） |
+| 网络 | 打包机需能访问所选 pip 源 |
+| 输入包 | 有效的 Dify 插件 `.difypkg`，**且包含 `requirements.txt`**（官方市场 / GitHub Releases 的包都满足） |
+| 可选 | `uv`（用于离线解析验证，`pip install uv`） |
+
+## 兼容性
+
+脚本只依赖 Python 标准库 + pip（无 shell 命令、无平台相关路径），三大桌面系统均可运行：
+
+| 系统 | 状态 |
+| ---- | ---- |
+| macOS (arm64) | ✅ 已实测——完整流程，arm64 与双架构构建 |
+| Linux (amd64) | ✅ 已实测——Debian 容器内完整流程，含 uv 离线验证 |
+| Linux (arm64) | ✅ 与上述实测构建同一代码路径 |
+| Windows | ✅ 设计兼容（纯标准库、UTF-8 控制台处理、路径分隔符处理）；欢迎实机验证，有问题提 issue |
+
+Windows 下调用：`python build-offline-pkg.py ...`（或 `py -3 ...`）。
 
 ## 快速开始
 
@@ -319,20 +95,11 @@ Windows：
 python build-offline-pkg.py --arch amd64 --pip-source tsinghua
 ```
 
-## 兼容性
-
-脚本只依赖 Python 标准库 + pip（无 shell 命令、无平台相关路径），三大桌面系统均可运行：
-
-| 系统 | 状态 |
-| ---- | ---- |
-| macOS (arm64) | ✅ 已实测——完整流程，arm64 与双架构构建 |
-| Linux (amd64) | ✅ 已实测——Debian 容器内完整流程，含 uv 离线验证 |
-| Linux (arm64) | ✅ 与上述实测构建同一代码路径 |
-| Windows | ✅ 设计兼容（纯标准库、UTF-8 控制台处理、路径分隔符处理）；欢迎实机验证，有问题提 issue |
-
-Windows 下调用：`python build-offline-pkg.py ...`（或 `py -3 ...`）。
-
 ## 参数
+
+```
+python3 build-offline-pkg.py [options]
+```
 
 | 参数 | 取值 | 说明 |
 | ---- | ---- | ---- |
@@ -346,24 +113,103 @@ Windows 下调用：`python build-offline-pkg.py ...`（或 `py -3 ...`）。
 | `--log-file` | 路径 | 日志文件（默认脚本同目录 `build-offline-pkg.log`） |
 | `--verbose` | — | 控制台调试级输出（日志文件始终全量记录） |
 
+产物命名：`openai_api_compatible-0.0.65-arm64.difypkg` →
+`openai_api_compatible-0.0.65-arm64-offline.difypkg`（`--arch both` → `-all-arch-offline`）。
+
+## 获取原始 .difypkg
+
+1. 从**官方市场 / GitHub Releases** 获取所需插件的发布包——推荐，一定包含 `requirements.txt`；
+2. 用官方 CLI 从源码打包：`dify plugin package <目录> -o out.difypkg`
+   —— CLI 安装方式见 [Dify Plugin CLI](https://docs.dify.ai/en/develop-plugin/getting-started/cli)
+   （二进制下载：[dify-plugin-daemon releases](https://github.com/langgenius/dify-plugin-daemon/releases)）；
+3. 从已有的 Dify 实例导出。
+
+> 本工具只负责重打包；如需从源码打包，请先用官方 CLI。
+
+## pip 源
+
+| 名称 | 地址 |
+| ---- | ---- |
+| `official` | `https://pypi.org/simple` |
+| `aliyun` | `https://mirrors.aliyun.com/pypi/simple/` |
+| `tsinghua` | `https://pypi.tuna.tsinghua.edu.cn/simple` |
+| `tencent` | `https://mirrors.cloud.tencent.com/pypi/simple` |
+| `ustc` | `https://pypi.mirrors.ustc.edu.cn/simple/` |
+
+镜像偶尔会比官方源晚同步几小时到几天（新发布的版本可能暂时缺失），某个依赖下载失败时换源即可：
+
+```bash
+python3 build-offline-pkg.py --pip-source aliyun
+# 或使用内部镜像：
+python3 build-offline-pkg.py --pip-index-url http://nexus.internal/pypi/simple
+```
+
+## 日志与失败处理
+
+- 先整包下载（快）；失败后自动转入逐包下载，已下载的部分自动复用、不会重复下载；
+- 每个依赖有独立的重试和日志行：
+
+```
+2026-09-06 18:14:51 [INFO] [3/43] gevent==26.5.0 —— 第 1/3 次下载尝试
+2026-09-06 18:14:53 [WARNING] [3/43] gevent==26.5.0 —— 失败(exit=1): ERROR: No matching distribution ...
+2026-09-06 18:15:02 [ERROR] 依赖下载失败: gevent==26.5.0
+...
+2026-09-06 18:15:02 [ERROR] 存在下载失败的依赖（43 条），详见上方 [ERROR] 日志: build-offline-pkg.log
+```
+
+- 失败时退出码为 **1**，且不产出任何包。
+
+## 校验
+
+装有 `uv` 时，脚本会执行**守护进程同款安装命令**做离线解析验证：
+
+```
+uv pip install --dry-run --offline --target <tmp> \
+    --python-platform aarch64-unknown-linux-gnu --python-version 3.12 \
+    -r requirements.txt
+```
+
+出现 `离线解析验证通过` 即代表该包可以在服务器上纯离线安装。
+
 ## 内网服务器安装注意
 
-1. 重打包会破坏官方签名，报 `bad signature` 时在部署 `.env` 设
-   `FORCE_VERIFYING_SIGNATURE=false` 并重启 `plugin_daemon`；
-2. Dify 1.17.0 默认 `PLUGIN_MAX_PACKAGE_SIZE` 50MB，双架构包超限时调大；
-3. 上传报 `413 Request Entity Too Large` 时调大前置 nginx 的 `client_max_body_size`。
+1. **签名校验**——重打包会破坏官方签名。安装报
+   `plugin verification has been enabled ... bad signature` 时，在 Dify 部署 `.env` 设置并重启守护进程：
+   ```bash
+   FORCE_VERIFYING_SIGNATURE=false
+   docker compose up -d plugin_daemon
+   ```
+2. **包大小限制**——Dify 1.17.0 的 api 容器默认 `PLUGIN_MAX_PACKAGE_SIZE=52428800`（50MB），
+   单架构包一般够用；双架构包超限时调大该值；
+3. **前置 nginx**——上传报 `413 Request Entity Too Large` 时，把对应 nginx 的
+   `client_max_body_size` 调到大于包体积后 reload。
 
-## 常见问题（FAQ）
+## FAQ
 
 - **为什么用 manylinux2014 + manylinux_2_28 两个标签？** 部分新包（如 gevent 新版）只发
-  `manylinux_2_28` wheel；官方守护进程镜像为 Ubuntu 24.04，两者都兼容。
+  `manylinux_2_28` wheel；官方守护进程镜像为 Ubuntu 24.04（glibc 2.39），两者都兼容。
 - **需要装官方 Dify CLI 吗？** 不需要；只有“从源码打包原始包”才需要它。
-- **重复打包 SHA256 一样吗？** 一样（固定时间戳 + 排序）。
-- **both 包体积翻倍吗？** 仅二进制 wheel 双份，纯 Python wheel 只存一份（约 1.6 倍）。
+- **重复打包 SHA256 一样吗？** 一样（固定时间戳 + 排序，同内容同字节）。
+- **both 包体积翻倍吗？** 仅二进制 wheel 双份（按 `platform_machine` 标记），纯 Python
+  wheel 只存一份；典型模型供应商插件从 ~13MB（单架构）到 ~21MB（双架构）。
 - **能用公司内部镜像吗？** `--pip-index-url http://<镜像>/pypi/simple`。
 
-## 许可证与声明
+## 项目结构
 
-[MIT](LICENSE)（请把 LICENSE 里的版权占位符改成你的名字）。
+```
+.
+├── build-offline-pkg.py          # 打包工具（纯 Python 3 标准库）
+├── 离线包打包文档.md               # 中文详细文档
+├── build-offline-pkg.log         # 运行日志（每次运行追加）
+├── README.md                     # 中文说明（本文件）
+├── README_EN.md                  # English README
+└── LICENSE
+```
 
-本项目为社区工具，与 langgenius / Dify 官方无关；"Dify" 等商标归其所有者所有。
+## 声明
+
+本项目为社区工具，**与 langgenius / Dify 官方无关**；"Dify" 等商标归其所有者所有。
+
+## 许可证
+
+[MIT](LICENSE)
