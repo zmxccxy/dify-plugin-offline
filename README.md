@@ -87,6 +87,8 @@ uv pip install --dry-run --offline -r requirements.txt   ← 与守护进程安�
 
 Windows 下调用：`python build-offline-pkg.py ...`（或 `py -3 ...`）。
 
+> ⚠️ **版本声明**：本项目目前已在 **Dify 1.17.0**（plugin-daemon 0.6.x）上验证，其他 Dify 版本**不保证兼容**。
+
 ## 快速开始
 
 ```bash

@@ -103,6 +103,8 @@ OS-specific paths, and runs on all major desktop OSes:
 
 Windows invocation: `python build-offline-pkg.py ...` (or `py -3 ...`).
 
+> ⚠️ **Version notice**: currently validated against **Dify 1.17.0** (plugin-daemon 0.6.x); other Dify versions are **not guaranteed** to be compatible.
+
 ## Quick start
 
 ```bash
