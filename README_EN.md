@@ -1,12 +1,18 @@
-# dify-plugin-offline
-
 <div align="center">
 
-**将 Dify 插件（.difypkg）重打包为内网 / 离线安装包**
+# 📦 dify-plugin-offline
 
-**Repackage Dify plugin packages for air-gapped / offline deployment**
+**将 Dify 插件（.difypkg）重打包为内网离线安装包** · **Repackage Dify plugins for air-gapped / offline deployment**
 
-[中文说明](README.md) · [Python 3.8+](https://www.python.org/) · macOS / Windows / Linux · [MIT License](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![Platforms](https://img.shields.io/badge/Platforms-macOS%20%E2%80%A2%20Windows%20%E2%80%A2%20Linux-1f6feb)](#compatibility)
+[![Stars](https://img.shields.io/github/stars/zmxccxy/dify-plugin-offline?logo=github&logoColor=white)](https://github.com/zmxccxy/dify-plugin-offline)
+[![Release](https://img.shields.io/github/v/release/zmxccxy/dify-plugin-offline)](https://github.com/zmxccxy/dify-plugin-offline/releases)
+[![Last commit](https://img.shields.io/github/last-commit/zmxccxy/dify-plugin-offline?logo=git&logoColor=white)](https://github.com/zmxccxy/dify-plugin-offline/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/zmxccxy/dify-plugin-offline?color=1f6feb)](https://github.com/zmxccxy/dify-plugin-offline/graphs/contributors)
+
+[简体中文](README.md) | **English**
 
 </div>
 
@@ -241,7 +247,9 @@ Yes: `--pip-index-url http://<mirror>/pypi/simple`.
 ## Disclaimer
 
 This is a community tool, **not affiliated with or endorsed by langgenius / Dify**.
-"Dify" and related marks belong to their respective owners.
+"Dify" and related marks belong to their respective owners. The README layout and badge
+style are inspired by the [official Dify repository](https://github.com/langgenius/dify) —
+thanks to the Dify team.
 
 ## License
 

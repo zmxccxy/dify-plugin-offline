@@ -1,12 +1,18 @@
-# dify-plugin-offline
-
 <div align="center">
 
-**将 Dify 插件（.difypkg）重打包为内网 / 离线安装包**
+# 📦 dify-plugin-offline
 
-**Repackage Dify plugin packages for air-gapped / offline deployment**
+**将 Dify 插件（.difypkg）重打包为内网离线安装包** · **Repackage Dify plugins for air-gapped / offline deployment**
 
-[English](README_EN.md) · [Python 3.8+](https://www.python.org/) · macOS / Windows / Linux · [MIT License](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![Platforms](https://img.shields.io/badge/Platforms-macOS%20%E2%80%A2%20Windows%20%E2%80%A2%20Linux-1f6feb)](#兼容性)
+[![Stars](https://img.shields.io/github/stars/zmxccxy/dify-plugin-offline?logo=github&logoColor=white)](https://github.com/zmxccxy/dify-plugin-offline)
+[![Release](https://img.shields.io/github/v/release/zmxccxy/dify-plugin-offline)](https://github.com/zmxccxy/dify-plugin-offline/releases)
+[![Last commit](https://img.shields.io/github/last-commit/zmxccxy/dify-plugin-offline?logo=git&logoColor=white)](https://github.com/zmxccxy/dify-plugin-offline/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/zmxccxy/dify-plugin-offline?color=1f6feb)](https://github.com/zmxccxy/dify-plugin-offline/graphs/contributors)
+
+**简体中文** | [English](README_EN.md)
 
 </div>
 
@@ -209,6 +215,7 @@ uv pip install --dry-run --offline --target <tmp> \
 ## 声明
 
 本项目为社区工具，**与 langgenius / Dify 官方无关**；"Dify" 等商标归其所有者所有。
+README 的排版与徽章风格参考了 [Dify 官方仓库](https://github.com/langgenius/dify)，致谢 Dify 团队。
 
 ## 许可证
 
