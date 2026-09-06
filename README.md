@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="images/dify-plugin-offline-wordmark-poster-cn.png" alt="dify-plugin-offline 介绍海报" width="100%" />
-</p>
-
 <div align="center">
 
 <img src="images/dify-plugin-offline-logo.svg" width="96" alt="dify-plugin-offline logo" />
@@ -21,6 +17,10 @@
 **简体中文** | [English](README_EN.md)
 
 </div>
+
+<p align="center">
+  <img src="images/dify-plugin-offline-wordmark-poster-cn.png" alt="dify-plugin-offline 介绍海报" width="100%" />
+</p>
 
 ## 解决什么问题
 
