@@ -37,16 +37,24 @@ wheel 内置进包内，守护进程全部从本地文件安装——**安装时
 
 ```
 原始 .difypkg
-   │ 1. 解压
+      │ 1. 解压
+      ▼
+
 插件源码 + requirements.txt + pyproject.toml + uv.lock
-   │ 2. pip download（按目标架构 arm64 / amd64，manylinux2014 + manylinux_2_28，
-   │    Python 版本取自 manifest.yaml 的 meta.runner.version）
+      │ 2. pip download（按目标架构 arm64 / amd64，manylinux2014 + manylinux_2_28，
+      │     Python 版本取自 manifest.yaml 的 meta.runner.version）
+      ▼
+
 deps/*.whl
-   │ 3. 重写 requirements.txt → ./deps/xxx.whl（--arch both 时按 platform_machine 标记）
-   │ 4. 删除 pyproject.toml / uv.lock → 强制守护进程走 requirements.txt 本地安装路径
-   │ 5. 重新打包（固定时间戳，产物字节级可复现）
+      │ 3. 重写 requirements.txt → ./deps/xxx.whl（--arch both 时按 platform_machine 标记）
+      │ 4. 删除 pyproject.toml / uv.lock → 强制守护进程走 requirements.txt 本地安装路径
+      │ 5. 重新打包（固定时间戳，产物字节级可复现）
+      ▼
+
 <原名>-<arch>-offline.difypkg
-   │ 6. 可选校验
+      │ 6. 可选校验（装有 uv 时执行）
+      ▼
+
 uv pip install --dry-run --offline -r requirements.txt   ← 与守护进程安装命令完全一致
 ```
 

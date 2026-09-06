@@ -40,22 +40,26 @@ ARM64 intranet Dify 1.17.0 server.
 
 ```
 original .difypkg
-      │
-      ▼  1. unzip
+      │ 1. unzip
+      ▼
+
 plugin source + requirements.txt + pyproject.toml + uv.lock
-      │
-      ▼  2. pip download (per target arch: arm64 / amd64, manylinux2014 + manylinux_2_28,
+      │ 2. pip download (per target arch: arm64 / amd64, manylinux2014 + manylinux_2_28,
       │     Python version read from manifest.yaml → meta.runner.version)
+      ▼
+
 deps/*.whl
-      │
-      ▼  3. rewrite requirements.txt  →  ./deps/xxx.whl
+      │ 3. rewrite requirements.txt  →  ./deps/xxx.whl
       │     (--arch both adds platform_machine markers)
-      ▼  4. remove pyproject.toml & uv.lock
+      │ 4. remove pyproject.toml & uv.lock
       │     → forces the daemon onto the requirements.txt (local) path
-      ▼  5. re-zip (deterministic, fixed timestamps)
+      │ 5. re-zip (deterministic, fixed timestamps)
+      ▼
+
 <name>-<arch>-offline.difypkg
-      │
-      ▼  6. optional verification
+      │ 6. optional verification (when uv is available)
+      ▼
+
 uv pip install --dry-run --offline -r requirements.txt   ← same command the daemon uses
 ```
 
