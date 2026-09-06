@@ -1,0 +1,13 @@
+# 日志与产物
+build-offline-pkg.log
+*.difypkg
+*.sha256
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# 系统文件
+.DS_Store
+Thumbs.db
