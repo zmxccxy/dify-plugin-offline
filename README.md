@@ -1,6 +1,8 @@
 <div align="center">
 
-# 📦 dify-plugin-offline
+<img src="images/dify-plugin-offline-logo.svg" width="96" alt="dify-plugin-offline logo" />
+
+# dify-plugin-offline
 
 **将 Dify 插件（.difypkg）重打包为内网离线安装包** · **Repackage Dify plugins for air-gapped / offline deployment**
 
@@ -15,6 +17,10 @@
 **简体中文** | [English](README_EN.md)
 
 </div>
+
+<p align="center">
+  <img src="images/dify-plugin-offline-wordmark-poster-cn.png" alt="dify-plugin-offline 介绍海报" width="100%" />
+</p>
 
 ## 解决什么问题
 
@@ -205,6 +211,9 @@ uv pip install --dry-run --offline --target <tmp> \
 ```
 .
 ├── build-offline-pkg.py          # 打包工具（纯 Python 3 标准库）
+├── images/                       # logo / 海报素材
+│   ├── dify-plugin-offline-logo.svg
+│   └── dify-plugin-offline-wordmark-poster-cn.png · -en.png
 ├── 离线包打包文档.md               # 中文详细文档
 ├── build-offline-pkg.log         # 运行日志（每次运行追加）
 ├── README.md                     # 中文说明（本文件）

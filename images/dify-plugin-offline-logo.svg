@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#090A0D"/>
+      <stop offset="1" stop-color="#171A22"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#155EEF"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="26" stdDeviation="34" flood-color="#000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect x="92" y="92" width="840" height="840" rx="210" fill="url(#bg)" filter="url(#shadow)"/>
+
+  <!-- package cube -->
+  <path d="M512 255 L745 390 L512 525 L279 390 Z" fill="url(#blue)" stroke="#FFFFFF" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M279 390 L512 525 L512 779 L279 644 Z" fill="#0F1117" stroke="#FFFFFF" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M745 390 L512 525 L512 779 L745 644 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="22" stroke-linejoin="round"/>
+
+  <!-- package tape, stylized as plugin rail -->
+  <path d="M432 303 L512 349 L592 303 L592 438 L512 484 L432 438 Z" fill="#0B0D12" opacity="0.96"/>
+
+  <!-- plug on white face -->
+  <g transform="translate(0,6)">
+    <path d="M584 531 v50 c0 52 42 94 94 94 h18" fill="none" stroke="#155EEF" stroke-width="26" stroke-linecap="round"/>
+    <rect x="590" y="485" width="112" height="96" rx="28" fill="#155EEF"/>
+    <rect x="614" y="455" width="18" height="40" rx="9" fill="#155EEF"/>
+    <rect x="660" y="455" width="18" height="40" rx="9" fill="#155EEF"/>
+    <!-- intentional cable break -->
+    <path d="M709 674 h42" stroke="#0B0D12" stroke-width="26" stroke-linecap="round"/>
+    <path d="M778 674 h50" stroke="#0B0D12" stroke-width="26" stroke-linecap="round"/>
+    <path d="M752 646 l26 28 -26 28" fill="none" stroke="#155EEF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- subtle offline slash motif -->
+  <path d="M250 754 L360 644" stroke="#155EEF" stroke-width="28" stroke-linecap="round"/>
+  <circle cx="250" cy="754" r="18" fill="#155EEF"/>
+</svg>

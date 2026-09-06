@@ -1,6 +1,8 @@
 <div align="center">
 
-# 📦 dify-plugin-offline
+<img src="images/dify-plugin-offline-logo.svg" width="96" alt="dify-plugin-offline logo" />
+
+# dify-plugin-offline
 
 **将 Dify 插件（.difypkg）重打包为内网离线安装包** · **Repackage Dify plugins for air-gapped / offline deployment**
 
@@ -15,6 +17,10 @@
 [简体中文](README.md) | **English**
 
 </div>
+
+<p align="center">
+  <img src="images/dify-plugin-offline-wordmark-poster-en.png" alt="dify-plugin-offline intro poster" width="100%" />
+</p>
 
 ## What problem does it solve
 
@@ -237,6 +243,9 @@ Yes: `--pip-index-url http://<mirror>/pypi/simple`.
 ```
 .
 ├── build-offline-pkg.py          # the tool (Python 3 stdlib only)
+├── images/                       # logo & poster assets
+│   ├── dify-plugin-offline-logo.svg
+│   └── dify-plugin-offline-wordmark-poster-cn.png · -en.png
 ├── 离线包打包文档.md               # full Chinese documentation
 ├── build-offline-pkg.log         # generated log (appended per run)
 ├── README.md                     # 中文说明 (Chinese)
